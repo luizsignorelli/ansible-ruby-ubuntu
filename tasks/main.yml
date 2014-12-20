@@ -1,0 +1,65 @@
+---
+
+#### ruby-install
+- name: Download ruby-install
+  shell: wget -O ruby-install-{{ ruby_install_version }}.tar.gz https://github.com/postmodern/ruby-install/archive/v{{ ruby_install_version }}.tar.gz
+  register: ruby_install_downloaded
+
+- name: Extract ruby-install
+  shell: tar -xzvf ruby-install-{{ ruby_install_version }}.tar.gz
+  when: ruby_install_downloaded | changed
+
+- name: Install ruby-install
+  sudo: true
+  shell:
+    chdir=ruby-install-{{ ruby_install_version }}
+    make install
+  when: ruby_install_downloaded | changed
+  register: ruby_install_installed
+
+- name: Clean up ruby-install sources
+  shell: rm -rf ruby-install-*
+  when: ruby_install_installed | changed
+
+#### chruby
+#Consider using get_url module rather than running wget
+- name: Download chruby
+  shell: wget -O chruby-{{ chruby_version }}.tar.gz https://github.com/postmodern/chruby/archive/v{{ chruby_version }}.tar.gz
+  register: chruby_downloaded
+
+#Consider using unarchive module rather than running tar
+- name: Extract chruby
+  shell: tar -xzvf chruby-{{ chruby_version }}.tar.gz
+  when: chruby_downloaded | changed
+  register: chruby_extracted
+
+- name: Install chruby
+  sudo: true
+  shell: cd chruby-{{ chruby_version }}/ && make install
+  when: chruby_extracted | changed
+  register: chruby_installed
+
+#Consider using file module with state=absent rather than running rm
+- name: Clean up chruby sources
+  shell: rm -rf chruby-*
+  when: chruby_installed | changed
+
+- name: Attach chruby into shell
+  sudo: true
+  template: src=chruby.sh dest=/etc/profile.d/chruby.sh
+
+#### install ruby
+
+- name: Install ruby {{ ruby_version }}
+  sudo: true
+  shell: ruby-install ruby {{ ruby_version }}
+
+- name: Install bundler for rubies
+  sudo: true
+  shell: >
+    executable=/bin/bash source /etc/profile;
+    chruby {{ ruby_version }} && gem install bundler
+
+- name: Copy .gemrc
+  sudo: yes
+  template: src=gemrc dest=~/.gemrc
