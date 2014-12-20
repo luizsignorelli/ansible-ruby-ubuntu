@@ -1,4 +1,5 @@
-ansible-chruby-ruby-install
+ansible-ruby-ubuntu
 ===========================
 
-Ansible role to install chruby and ruby-install on Ubuntu
+Ansible role to install the latest ruby on ubuntu. 
+Uses chruby and ruby-install.
