@@ -49,8 +49,7 @@
   template: src=chruby.sh dest=/etc/profile.d/chruby.sh
 
 #### install ruby
-
-- name: Install ruby {{ ruby_version }}
+- name: Install ruby
   sudo: true
   shell: ruby-install ruby {{ ruby_version }}
 
