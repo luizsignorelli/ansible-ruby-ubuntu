@@ -51,7 +51,7 @@
 #### install ruby
 - name: Install ruby
   sudo: true
-  shell: ruby-install ruby {{ ruby_version }}
+  shell: ruby-install ruby {{ ruby_version }} -- --enable-shared
 
 - name: Install bundler for rubies
   sudo: true
